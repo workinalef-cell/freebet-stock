@@ -2,7 +2,8 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
-import { AuthProvider } from '@/components/auth-provider';
+import { AuthProvider } from '@/lib/auth-context';
+import { AuthContent } from '@/components/auth-content';
 import PWAInstaller from '@/components/pwa-installer';
 import RegisterSW from './register-sw';
 
@@ -36,9 +37,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            {children}
-            <PWAInstaller />
-            <RegisterSW />
+            <AuthContent>
+              {children}
+              <PWAInstaller />
+              <RegisterSW />
+            </AuthContent>
           </AuthProvider>
         </ThemeProvider>
       </body>

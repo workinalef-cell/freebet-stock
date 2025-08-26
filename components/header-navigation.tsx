@@ -14,7 +14,7 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/lib/auth-context";
 
 interface NavItem {
   name: string;

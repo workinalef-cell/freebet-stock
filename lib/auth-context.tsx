@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from './supabase';
 import { User, Session } from '@supabase/supabase-js';
 
 // Interface para o contexto de autenticação
@@ -13,17 +13,22 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-// Criar o contexto com um valor padrão para evitar o erro "useAuth deve ser usado dentro de um AuthProvider"
+// Criar o contexto com um valor padrão
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
   signIn: async () => false,
-  signOut: async () => {}
+  signOut: async () => {},
 });
 
+// Hook para usar o contexto
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
 // Provider component
-export function AuthContextProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,11 +104,3 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-// Hook para usar o contexto
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-// Re-exportar o AuthProvider para uso externo
-export { AuthContextProvider as AuthProvider };

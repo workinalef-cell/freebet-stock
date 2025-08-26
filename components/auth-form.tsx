@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/auth-context';
 import { motion } from 'framer-motion';
 
 export function AuthForm() {
