@@ -1,7 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-const { createCanvas, loadImage } = require('canvas');
-const sharp = require('sharp');
+
+// Tentar carregar sharp, mas falhar silenciosamente se não estiver disponível
+let sharp;
+try {
+  sharp = require('sharp');
+} catch (error) {
+  console.log('Sharp não está disponível. Os ícones existentes serão mantidos.');
+  process.exit(0);
+}
 
 const SOURCE_SVG = path.join(__dirname, '../public/icons/icon.svg');
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
