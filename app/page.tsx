@@ -5,17 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { PageHeader } from "@/components/page-header";
-import { TicketIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { TicketIcon } from "@heroicons/react/24/outline";
 import { FreebetForm } from "@/components/freebet-form";
 import { FreebetList } from "@/components/freebet-list";
 import { LoadingState, FreebetLoadingSkeleton } from "@/components/loading-state";
 import { Freebet } from "@/lib/types";
-import { getFreebets, archiveMonthlyFreebets, cache, CACHE_KEY_FREEBETS } from "@/lib/storage";
+import { getFreebets, calculateRealTimeStats, cache, CACHE_KEY_FREEBETS } from "@/lib/storage";
 
 export default function FreebetsPage() {
   const [freebets, setFreebets] = useState<Freebet[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isArchiving, setIsArchiving] = useState<boolean>(false);
 
   // Otimização das estatísticas com useMemo
   const stats = useMemo(() => {
@@ -53,6 +52,9 @@ export default function FreebetsPage() {
       });
       
       setFreebets(mesAtualFreebets);
+      
+      // Calcular estatísticas em tempo real para atualizar os dados nas estatísticas
+      await calculateRealTimeStats();
     } catch (error) {
       console.error("Erro ao carregar freebets:", error);
     } finally {
@@ -65,34 +67,13 @@ export default function FreebetsPage() {
     loadFreebets();
   }, [loadFreebets]);
 
-  // Função para arquivar freebets de meses anteriores
-  const handleArchiveFreebets = async () => {
-    setIsArchiving(true);
-    
-    try {
-      // Realizar o arquivamento
-      await archiveMonthlyFreebets();
-      
-      // Recarregar as freebets após o arquivamento
-      setTimeout(async () => {
-        await loadFreebets();
-        setIsArchiving(false);
-        alert("Arquivamento concluído! As freebets de meses anteriores foram movidas para estatísticas.");
-      }, 1000);
-    } catch (error) {
-      console.error("Erro ao arquivar freebets:", error);
-      setIsArchiving(false);
-      alert("Ocorreu um erro ao arquivar as freebets.");
-    }
-  };
-
   // Função otimizada chamada após adicionar/atualizar uma freebet
   const handleFreebetChange = async () => {
     try {
       // Forçar invalidação do cache antes de carregar
       cache.invalidate(CACHE_KEY_FREEBETS);
       
-      // Recarregar dados
+      // Recarregar dados e atualizar estatísticas
       await loadFreebets();
     } catch (error) {
       console.error("Erro ao atualizar freebets:", error);
@@ -111,19 +92,10 @@ export default function FreebetsPage() {
           description="Gerencie suas freebets ativas e histórico"
           icon={<TicketIcon className="w-6 h-6" />}
         />
-        <Button 
-          onClick={handleArchiveFreebets}
-          disabled={isArchiving}
-          className="bg-fedora-blue hover:bg-fedora-blue/90 flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto"
-        >
-          {isArchiving ? "Arquivando..." : "Arquivar"}
-          <ArrowPathIcon className={`w-4 h-4 ${isArchiving ? 'animate-spin' : ''}`} />
-        </Button>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
         <Card className="overflow-hidden border-0 shadow-md bg-white dark:bg-gray-900">
-          <div className="absolute top-0 left-0 w-1 h-full bg-fedora-blue"></div>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex justify-between items-center">
               <span>Freebets Ativas</span>
@@ -138,7 +110,6 @@ export default function FreebetsPage() {
         </Card>
 
         <Card className="overflow-hidden border-0 shadow-md bg-white dark:bg-gray-900">
-          <div className="absolute top-0 left-0 w-1 h-full bg-fedora-accent"></div>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex justify-between items-center">
               <span>Valor Total</span>
@@ -153,7 +124,6 @@ export default function FreebetsPage() {
         </Card>
 
         <Card className="overflow-hidden border-0 shadow-md bg-white dark:bg-gray-900">
-          <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex justify-between items-center">
               <span>Lucro Total</span>

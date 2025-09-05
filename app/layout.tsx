@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   title: 'FreeBet Stock',
   description: 'Gestão e controle de freebets',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icons/icon-512x512.png',
+    apple: '/icons/icon-192x192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

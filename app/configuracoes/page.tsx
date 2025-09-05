@@ -20,7 +20,6 @@ import {
 export default function ConfiguracoesPage() {
   const { theme, setTheme } = useTheme();
   const [commission, setCommission] = useState<number>(2);
-  const [monthlyGoal, setMonthlyGoal] = useState<number>(500);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(theme === "dark");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
@@ -29,7 +28,6 @@ export default function ConfiguracoesPage() {
   useEffect(() => {
     const settings = getSettings();
     setCommission(settings.commission);
-    setMonthlyGoal(settings.monthlyGoal);
     setIsDarkMode(settings.theme === 'dark');
   }, []);
 
@@ -47,7 +45,6 @@ export default function ConfiguracoesPage() {
     // Salvar configurações usando a função utilitária
     const newSettings: UserSettings = {
       commission,
-      monthlyGoal,
       theme: isDarkMode ? 'dark' : 'light'
     };
     saveSettings(newSettings);
@@ -69,11 +66,11 @@ export default function ConfiguracoesPage() {
         icon={<Cog6ToothIcon className="w-6 h-6" />}
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div>
+      <div className="flex flex-col items-center gap-6 w-full">
+        <div className="w-full max-w-lg">
           <Card className="border-0 shadow-md overflow-hidden">
             <div className="absolute top-0 h-1 left-0 right-0 bg-gradient-to-r from-fedora-blue to-fedora-accent"></div>
-            <CardHeader>
+            <CardHeader className="text-center">
               <CardTitle>Aparência</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -97,10 +94,10 @@ export default function ConfiguracoesPage() {
           </Card>
         </div>
 
-        <div>
+        <div className="w-full max-w-lg">
           <Card className="border-0 shadow-md overflow-hidden">
             <div className="absolute top-0 h-1 left-0 right-0 bg-gradient-to-r from-fedora-blue to-fedora-accent"></div>
-            <CardHeader>
+            <CardHeader className="text-center">
               <CardTitle>Valores Padrão</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -136,73 +133,49 @@ export default function ConfiguracoesPage() {
                   Comissão aplicada pela exchange em todos os cálculos
                 </p>
               </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="monthlyGoal"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Meta Mensal (R$)
-                </label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="monthlyGoal"
-                    type="number"
-                    min={0}
-                    step={50}
-                    value={monthlyGoal}
-                    onChange={(e) =>
-                      setMonthlyGoal(parseFloat(e.target.value) || 0)
-                    }
-                    className="border-gray-300 dark:border-gray-700 focus:ring-fedora-blue focus:border-fedora-blue"
-                  />
-                  <Button
-                    onClick={() => setMonthlyGoal(500)}
-                    variant="outline"
-                    className="whitespace-nowrap"
-                  >
-                    Redefinir
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Sua meta mensal de lucro com extração de freebets
-                </p>
-              </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="md:col-span-2">
+        <div className="w-full max-w-lg">
           <Card className="border-0 shadow-md overflow-hidden">
             <div className="absolute top-0 h-1 left-0 right-0 bg-gradient-to-r from-fedora-blue to-fedora-accent"></div>
-            <CardHeader>
+            <CardHeader className="text-center">
               <CardTitle>Suporte</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center">
-                <div className="flex flex-col items-center text-center p-8 rounded-lg bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 hover:border-fedora-blue/30 dark:hover:border-fedora-accent/30 hover:shadow-md transition-all max-w-sm">
+                <a 
+                  href="https://t.me/@okalleby" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center text-center p-8 rounded-lg bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 hover:border-fedora-blue/30 dark:hover:border-fedora-accent/30 hover:shadow-md transition-all max-w-sm"
+                >
                   <div className="w-16 h-16 rounded-full bg-fedora-blue/10 dark:bg-fedora-blue/20 flex items-center justify-center mb-4">
                     <ClockIcon className="h-8 w-8 text-fedora-blue dark:text-fedora-accent" />
                   </div>
                   <h3 className="font-semibold text-lg mb-2">Suporte</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-2">
                     Disponível das 9h às 19h
                   </p>
-                </div>
+                  <p className="text-sm font-medium text-fedora-blue dark:text-fedora-accent">
+                    t.me/@okalleby
+                  </p>
+                </a>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      <div className="flex justify-end mt-4 relative">
+      <div className="flex justify-center mt-8 relative">
         <AnimatePresence>
           {showSuccess && (
             <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 100 }}
-              className="absolute right-32 top-1/2 transform -translate-y-1/2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-4 py-2 rounded-lg flex items-center space-x-2 border border-green-200 dark:border-green-700"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-0 transform -translate-y-full mb-4 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-4 py-2 rounded-lg flex items-center space-x-2 border border-green-200 dark:border-green-700"
             >
               <CheckIcon className="h-4 w-4" />
               <span className="text-sm font-medium">Configurações salvas!</span>
@@ -213,14 +186,14 @@ export default function ConfiguracoesPage() {
         <Button 
           onClick={handleSave}
           disabled={isSaving}
-          className="px-8 bg-fedora-blue hover:bg-fedora-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-12 py-6 text-lg bg-fedora-blue hover:bg-fedora-blue/90 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSaving ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
               />
               <span>Salvando...</span>
             </div>

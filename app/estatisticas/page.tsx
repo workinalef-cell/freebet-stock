@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { PageHeader } from "@/components/page-header";
 import { ChartBarIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
-import { getMonthlyStats } from "@/lib/storage";
+import { getMonthlyStats, calculateRealTimeStats } from "@/lib/storage";
 
 // Função para obter o nome do mês em português
 const getMonthName = (monthIndex: number): string => {
@@ -48,6 +48,7 @@ const formatStatsData = (stats: any[]): Record<number, any[]> => {
         mediaExtracao: stat.mediaExtracao,
         freebetsPerdidas: stat.freebetsPerdidas,
         valorTotal: stat.valorTotal,
+        lucroTotal: stat.lucroTotal || 0, // Adicionar lucro total
         date: new Date(stat.date)
       }));
       
@@ -64,22 +65,33 @@ export default function EstatisticasPage() {
   
   // Carregar estatísticas ao montar o componente
   useEffect(() => {
-    // Obter estatísticas mensais do localStorage
-    const stats = getMonthlyStats();
+    const loadStats = async () => {
+      try {
+        // Calcular estatísticas em tempo real
+        await calculateRealTimeStats();
+        
+        // Obter estatísticas mensais do localStorage
+        const stats = getMonthlyStats();
+        
+        if (stats.length > 0) {
+          // Obter anos disponíveis nas estatísticas
+          const availableYears = getUniqueYears(stats);
+          setYears(availableYears);
+          
+          // Formatar dados para o formato esperado pela interface
+          const formattedData = formatStatsData(stats);
+          setYearlyData(formattedData);
+        } else {
+          // Se não houver dados salvos, mostrar apenas o ano atual vazio
+          const currentYear = new Date().getFullYear();
+          setYearlyData({ [currentYear]: [] });
+        }
+      } catch (error) {
+        console.error("Erro ao carregar estatísticas:", error);
+      }
+    };
     
-    if (stats.length > 0) {
-      // Obter anos disponíveis nas estatísticas
-      const availableYears = getUniqueYears(stats);
-      setYears(availableYears);
-      
-      // Formatar dados para o formato esperado pela interface
-      const formattedData = formatStatsData(stats);
-      setYearlyData(formattedData);
-    } else {
-      // Se não houver dados salvos, mostrar apenas o ano atual vazio
-      const currentYear = new Date().getFullYear();
-      setYearlyData({ [currentYear]: [] });
-    }
+    loadStats();
   }, []);
   
   // Ordenar meses do mais recente para o mais antigo
@@ -205,6 +217,19 @@ export default function EstatisticasPage() {
                           {month.mediaExtracao}%
                         </p>
                       </div>
+                      <div className="rounded-lg bg-gray-50 dark:bg-gray-800/40 p-2 col-span-2">
+                        <p className="text-xs text-muted-foreground">
+                          Valor Total / Lucro
+                        </p>
+                        <div className="flex justify-between">
+                          <p className="text-lg font-bold">
+                            {formatCurrency(month.valorTotal)}
+                          </p>
+                          <p className="text-lg font-bold text-green-500">
+                            {formatCurrency(month.lucroTotal)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -272,24 +297,18 @@ export default function EstatisticasPage() {
                         </li>
                         <li className="flex justify-between items-center p-2 bg-white dark:bg-gray-900 rounded-md">
                           <span className="text-muted-foreground">
-                            Taxa de Sucesso:
-                          </span>
-                          <span className="font-medium text-green-500">
-                            {Math.round(
-                              (selectedMonthData.freebetsExtraidas /
-                                (selectedMonthData.freebetsExtraidas +
-                                  selectedMonthData.freebetsPerdidas || 1)) *
-                                100
-                            )}
-                            %
-                          </span>
-                        </li>
-                        <li className="flex justify-between items-center p-2 bg-white dark:bg-gray-900 rounded-md">
-                          <span className="text-muted-foreground">
                             Valor Total:
                           </span>
                           <span className="font-medium">
                             {formatCurrency(selectedMonthData.valorTotal)}
+                          </span>
+                        </li>
+                        <li className="flex justify-between items-center p-2 bg-white dark:bg-gray-900 rounded-md">
+                          <span className="text-muted-foreground">
+                            Lucro Total:
+                          </span>
+                          <span className="font-medium text-green-500">
+                            {formatCurrency(selectedMonthData.lucroTotal)}
                           </span>
                         </li>
                       </ul>

@@ -221,38 +221,17 @@ export function saveMonthlyStats(stats: MonthlyStats): void {
   }
 }
 
-// Função para arquivar freebets do mês anterior e movê-las para estatísticas
-export async function archiveMonthlyFreebets(): Promise<void> {
-  if (typeof window === "undefined") return;
+// Função para calcular estatísticas em tempo real
+export async function calculateRealTimeStats(): Promise<Record<string, MonthlyStats>> {
+  if (typeof window === "undefined") return {};
   
   try {
     const allFreebets = await getFreebets();
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth();
     
-    // Filtrar freebets do mês atual (para manter)
-    const currentMonthFreebets = allFreebets.filter((freebet) => {
-      const freebetDate = new Date(freebet.data);
-      return (
-        freebetDate.getFullYear() === currentYear &&
-        freebetDate.getMonth() === currentMonth
-      );
-    });
-    
-    // Identificar freebets de meses anteriores
-    const previousFreebets = allFreebets.filter((freebet) => {
-      const freebetDate = new Date(freebet.data);
-      return (
-        freebetDate.getFullYear() !== currentYear ||
-        freebetDate.getMonth() !== currentMonth
-      );
-    });
-    
-    // Agrupar freebets anteriores por mês/ano
+    // Agrupar freebets por mês/ano
     const groupedByMonth: Record<string, Freebet[]> = {};
     
-    previousFreebets.forEach((freebet) => {
+    allFreebets.forEach((freebet) => {
       const freebetDate = new Date(freebet.data);
       const year = freebetDate.getFullYear();
       const month = freebetDate.getMonth();
@@ -266,6 +245,8 @@ export async function archiveMonthlyFreebets(): Promise<void> {
     });
     
     // Converter grupos em estatísticas mensais
+    const realTimeStats: Record<string, MonthlyStats> = {};
+    
     Object.entries(groupedByMonth).forEach(([key, freebets]) => {
       const [year, month] = key.split('-').map(Number);
       
@@ -280,12 +261,12 @@ export async function archiveMonthlyFreebets(): Promise<void> {
       
       // Calcular média de extração e lucro total
       const extraidasFreebets = freebets.filter((fb) => fb.extraida);
-      const totalValor = extraidasFreebets.reduce((sum, fb) => sum + fb.valor, 0);
+      const totalValor = freebets.reduce((sum, fb) => sum + fb.valor, 0); // Alterado para considerar todas as freebets
       const totalLucro = extraidasFreebets.reduce((sum, fb) => sum + (fb.valorExtraido || 0), 0);
       
       // Calcular média de extração real
-      const mediaExtracao = extraidasFreebets.length > 0 && totalValor > 0
-        ? (totalLucro / totalValor) * 100
+      const mediaExtracao = extraidasFreebets.length > 0 && extraidasFreebets.reduce((sum, fb) => sum + fb.valor, 0) > 0
+        ? (totalLucro / extraidasFreebets.reduce((sum, fb) => sum + fb.valor, 0)) * 100
         : 0;
       
       // Criar objeto de estatísticas
@@ -301,22 +282,29 @@ export async function archiveMonthlyFreebets(): Promise<void> {
         date: new Date(year, month, 15).toISOString()
       };
       
-      // Salvar estatísticas
+      realTimeStats[key] = monthlyStats;
+      
+      // Também salvar nas estatísticas persistentes
       saveMonthlyStats(monthlyStats);
     });
     
-    // Manter apenas freebets do mês atual
-    localStorage.setItem(FREEBETS_KEY, JSON.stringify(currentMonthFreebets));
+    return realTimeStats;
     
   } catch (error) {
-    console.error("Erro ao arquivar freebets mensais:", error);
+    console.error("Erro ao calcular estatísticas em tempo real:", error);
+    return {};
   }
+}
+
+// Função para arquivar freebets do mês anterior e movê-las para estatísticas (mantida para compatibilidade)
+export async function archiveMonthlyFreebets(): Promise<void> {
+  // Agora esta função apenas chama a nova função de cálculo em tempo real
+  await calculateRealTimeStats();
 }
 
 // Configurações do usuário
 export interface UserSettings {
   commission: number;
-  monthlyGoal: number;
   theme: 'light' | 'dark';
 }
 
@@ -325,7 +313,6 @@ const SETTINGS_KEY = 'freebet-settings';
 // Configurações padrão
 const DEFAULT_SETTINGS: UserSettings = {
   commission: 2,
-  monthlyGoal: 500,
   theme: 'light'
 };
 
