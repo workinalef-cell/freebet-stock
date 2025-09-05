@@ -1,11 +1,13 @@
 {
   "name": "FreeBet Stock",
-  "short_name": "FreeBet",
-  "description": "Gerencie suas freebets e maximize seus lucros",
+  "short_name": "FreeBet Stock",
+  "description": "Gestão e controle de freebets para maximizar seus lucros",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "categories": ["productivity", "finance"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",

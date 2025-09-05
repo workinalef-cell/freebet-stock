@@ -44,10 +44,16 @@ export function AuthForm() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="inline-block p-4 rounded-full bg-fedora-blue/10 mb-4">
-            <div className="text-5xl font-bold text-fedora-blue">F</div>
+          <div className="inline-block p-4 rounded-xl bg-white dark:bg-gray-800 shadow-lg mb-4">
+            <img 
+              src="/icons/icon-192x192.png" 
+              alt="FreeBet Stock" 
+              className="w-16 h-16 mx-auto"
+            />
           </div>
-          <h1 className="text-2xl font-bold">FreeBet Stock</h1>
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-fedora-blue to-fedora-accent">
+            FreeBet Stock
+          </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
             Faça login para acessar sua conta
           </p>

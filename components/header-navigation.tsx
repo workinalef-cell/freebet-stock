@@ -60,11 +60,15 @@ export function HeaderNavigation() {
             {/* Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-fedora-blue to-fedora-accent flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">F</span>
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <img 
+                    src="/icons/icon-192x192.png" 
+                    alt="FreeBet Stock" 
+                    className="w-8 h-8 rounded-lg"
+                  />
                 </div>
                 <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-fedora-blue to-fedora-accent">
-                  FreeBet
+                  FreeBet Stock
                 </span>
               </Link>
             </div>
