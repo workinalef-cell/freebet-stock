@@ -14,7 +14,7 @@ import {
   SunIcon, 
   MoonIcon,
   CheckIcon,
-  ClockIcon
+  ChatBubbleLeftRightIcon
 } from "@heroicons/react/24/outline";
 
 export default function ConfiguracoesPage() {
@@ -146,20 +146,20 @@ export default function ConfiguracoesPage() {
             <CardContent>
               <div className="flex justify-center">
                 <a 
-                  href="https://t.me/@okalleby" 
+                  href="https://t.me/okalleby" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex flex-col items-center text-center p-8 rounded-lg bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 hover:border-fedora-blue/30 dark:hover:border-fedora-accent/30 hover:shadow-md transition-all max-w-sm"
                 >
                   <div className="w-16 h-16 rounded-full bg-fedora-blue/10 dark:bg-fedora-blue/20 flex items-center justify-center mb-4">
-                    <ClockIcon className="h-8 w-8 text-fedora-blue dark:text-fedora-accent" />
+                    <ChatBubbleLeftRightIcon className="h-8 w-8 text-fedora-blue dark:text-fedora-accent" />
                   </div>
                   <h3 className="font-semibold text-lg mb-2">Suporte</h3>
                   <p className="text-sm text-muted-foreground mb-2">
                     Disponível das 9h às 19h
                   </p>
                   <p className="text-sm font-medium text-fedora-blue dark:text-fedora-accent">
-                    t.me/@okalleby
+                    Telegram
                   </p>
                 </a>
               </div>
